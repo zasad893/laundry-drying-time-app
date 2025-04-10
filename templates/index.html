@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Laundry Drying Time Predictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_e586xKwm-WdtAArTRz-zkQLabOGYiV4&libraries=places"></script>
+</head>
+<body>
+  <main class="container">
+    <h1>Laundry Drying Time Predictor</h1>
+    <form id="locationForm" class="form">
+      <div class="input-group">
+        <input id="autocomplete" type="text" placeholder="Enter address or postcode" required />
+        <button type="button" class="location-btn" onclick="useMyLocation()">Use My Location</button>
+      </div>
+      <button type="submit" class="submit-btn">Submit</button>
+    </form>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
