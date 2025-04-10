@@ -6,5 +6,4 @@ requests
 gunicorn
 scikit-learn
 jsonify
-render_template
 waitress
