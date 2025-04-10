@@ -4,3 +4,7 @@ joblib
 numpy
 requests
 gunicorn
+sklearn
+jsonify
+render_template
+waitress
