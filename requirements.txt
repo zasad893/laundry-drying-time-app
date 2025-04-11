@@ -7,3 +7,4 @@ gunicorn
 scikit-learn
 jsonify
 waitress
+python-dotenv
