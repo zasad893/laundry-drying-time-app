@@ -49,6 +49,11 @@ def result():
 # ──────────────────────────────────────────────────────────────
 # MVC: Controller – API endpoint to handle prediction requests
 # ──────────────────────────────────────────────────────────────
+
+# Dummy predictions (for deployment without model)
+tshirt_minutes = 85  # about 1hr 25mins
+towel_minutes = 130  # about 2hr 10mins
+
 @app.route("/predict", methods=["POST"])
 def predict_drying_time():
     data = request.get_json()
@@ -110,6 +115,8 @@ def predict_drying_time():
         }
     })
 
+
+
 # def predict_drying_time():
 #     # Get data from POST request (JSON format)
 #     data = request.get_json()
@@ -170,9 +177,7 @@ def predict_drying_time():
 #     # Extract predicted drying times (in minutes)
 #     tshirt_minutes = round(y_pred[0][0], 2)
 #     towel_minutes = round(y_pred[0][1], 2)
-    # Dummy predictions (for deployment without model)
-      tshirt_minutes = 85  # about 1hr 25mins
-      towel_minutes = 130  # about 2hr 10mins
+
 
 
 #     # ──────────────────────────────────────────────────────────
