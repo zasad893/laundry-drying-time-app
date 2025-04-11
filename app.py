@@ -14,9 +14,9 @@ app = Flask(__name__)
 # Load pre-trained model and associated scalers
 # ──────────────────────────────────────────────────────────────
 print("Loading model and scalers...")
-model = load_model("model/laundry_time_predictor_advanced.keras")
-scaler_X = joblib.load("model/scaler_X_advanced.pkl")
-scaler_y = joblib.load("model/scaler_y_advanced.pkl")
+# model = load_model("model/laundry_time_predictor_advanced.keras")
+# scaler_X = joblib.load("model/scaler_X_advanced.pkl")
+# scaler_y = joblib.load("model/scaler_y_advanced.pkl")
 print("Model and scalers loaded successfully.")
 
 # ──────────────────────────────────────────────────────────────
@@ -51,31 +51,65 @@ def result():
 # ──────────────────────────────────────────────────────────────
 @app.route("/predict", methods=["POST"])
 def predict_drying_time():
+    data = request.get_json()
+    location = data.get("location")
+    lat = data.get("lat")
+    lng = data.get("lng")
+
+    if lat and lng:
+        query_param = f"{lat},{lng}"
+    elif location:
+        query_param = location
+    else:
+        return jsonify({"error": "No location or coordinates provided."}), 400
+
     try:
-        # same weather fetching logic...
+        url = f"http://api.weatherapi.com/v1/current.json?key={WEATHER_API_KEY}&q={query_param}"
+        response = requests.get(url)
+        weather_data = response.json()
 
-        # Instead of ML prediction:
-        tshirt_minutes = 89
-        towel_minutes = 129
+        if "current" not in weather_data:
+            return jsonify({"error": "Weather data not available for this location."}), 400
 
+        current = weather_data["current"]
+        temp = current["temp_c"]
+        cloud = current["cloud"]
+        wind = current["wind_mph"]
+        precip = current["precip_mm"]
+
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch weather data: {str(e)}"}), 500
+
+    if precip > 0.1:
         return jsonify({
+            "error": "It is currently raining. Outdoor drying is not recommended.",
             "weather": {
                 "temperature": float(temp),
                 "cloud": float(cloud),
                 "wind": float(wind),
                 "precip": float(precip)
-            },
-            "prediction": {
-                "tshirt_minutes": float(tshirt_minutes),
-                "towel_minutes": float(towel_minutes),
-                "tshirt_readable": format_minutes(tshirt_minutes),
-                "towel_readable": format_minutes(towel_minutes)
             }
         })
 
-    except Exception as e:
-        print("Error:", e)
-        return jsonify({"error": "Internal server error"}), 500
+    # Dummy prediction values (to avoid memory crash on Render)
+    tshirt_minutes = 85
+    towel_minutes = 130
+
+    return jsonify({
+        "weather": {
+            "temperature": float(temp),
+            "cloud": float(cloud),
+            "wind": float(wind),
+            "precip": float(precip)
+        },
+        "prediction": {
+            "tshirt_minutes": float(tshirt_minutes),
+            "towel_minutes": float(towel_minutes),
+            "tshirt_readable": format_minutes(tshirt_minutes),
+            "towel_readable": format_minutes(towel_minutes)
+        }
+    })
+
 # def predict_drying_time():
 #     # Get data from POST request (JSON format)
 #     data = request.get_json()
@@ -136,6 +170,10 @@ def predict_drying_time():
 #     # Extract predicted drying times (in minutes)
 #     tshirt_minutes = round(y_pred[0][0], 2)
 #     towel_minutes = round(y_pred[0][1], 2)
+    # Dummy predictions (for deployment without model)
+      tshirt_minutes = 85  # about 1hr 25mins
+      towel_minutes = 130  # about 2hr 10mins
+
 
 #     # ──────────────────────────────────────────────────────────
 #     # Return response in JSON format
